@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	accessTokenDomain "github.com/maik101010/proyectCourseOauth/src/domain/access_token"
 	"github.com/maik101010/proyectCourseOauth/src/service/access_token"
-	"github.com/maik101010/proyectCourseOauth/src/util/errors"
+	"github.com/maik101010/proyectCourseUtilsGoLibrary/rest_errors"
 	"net/http"
 )
 
@@ -23,7 +23,7 @@ func NewHandler(service access_token.Service) AccessTokenHandler  {
 func (h *accessTokenHandler) GetById(c *gin.Context){
 	accessToken, err := h.service.GetById(c.Param("access_token_id"))
 	if err!=nil {
-		c.JSON(err.Status, err)
+		c.JSON(err.Status(), err)
 		return
 	}
 	c.JSON(http.StatusOK, accessToken)
@@ -31,13 +31,13 @@ func (h *accessTokenHandler) GetById(c *gin.Context){
 func (h *accessTokenHandler) Create(c *gin.Context){
 	var accessTokenRequest accessTokenDomain.AccessTokenRequest
 	if err := c.ShouldBindJSON(&accessTokenRequest); err!=nil {
-		restErr := errors.NewBadRequestError("invalid json body")
-		c.JSON(restErr.Status,restErr)
+		restErr := rest_errors.NewBadRequestError("invalid json body")
+		c.JSON(restErr.Status(),restErr)
 		return
 	}
 	accessToken, err := h.service.Create(accessTokenRequest)
 	if err!=nil {
-		c.JSON(err.Status, err)
+		c.JSON(err.Status(), err)
 		return
 	}
 	c.JSON(http.StatusCreated, accessToken)

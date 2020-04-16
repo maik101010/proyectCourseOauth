@@ -2,8 +2,8 @@ package access_token
 
 import (
 	"fmt"
-	"github.com/maik101010/proyectCourseOauth/src/util/errors"
-	"github.com/maik101010/proyectCourseUsersApi/utils/crypto_utils"
+	"github.com/maik101010/proyectCourseUtilsGoLibrary/crypto_utils"
+	"github.com/maik101010/proyectCourseUtilsGoLibrary/rest_errors"
 	"strings"
 	"time"
 )
@@ -27,12 +27,12 @@ type AccessTokenRequest struct {
 	ClientSecret      string  `json:"client_secret"`
 
 }
-func (at * AccessTokenRequest) Validate() *errors.RestError  {
+func (at * AccessTokenRequest) Validate() rest_errors.RestError  {
 	switch at.GrantType {
 	case grantTypePassword:
 	case grantTypeCredential:
 	default:
-		return errors.NewBadRequestError("invalid grant_type parameter")
+		return rest_errors.NewBadRequestError("invalid grant_type parameter")
 	}
 	return nil
 }
@@ -45,19 +45,19 @@ type AccessToken struct {
 	Expires     int64  `json:"expires"`
 }
 
-func (at * AccessToken) Validate() *errors.RestError  {
+func (at * AccessToken) Validate() rest_errors.RestError  {
 	at.AccessToken = strings.TrimSpace(at.AccessToken)
 	if at.AccessToken=="" {
-		return errors.NewBadRequestError("invalid access token id")
+		return rest_errors.NewBadRequestError("invalid access token id")
 	}
 	if at.UserID<=0 {
-		return errors.NewBadRequestError("invalid user id")
+		return rest_errors.NewBadRequestError("invalid user id")
 	}
 	if at.ClientID<=0 {
-		return errors.NewBadRequestError("invalid client id")
+		return rest_errors.NewBadRequestError("invalid client id")
 	}
 	if at.Expires <=0 {
-		return errors.NewBadRequestError("invalid expiration id")
+		return rest_errors.NewBadRequestError("invalid expiration id")
 	}
 	return nil
 }

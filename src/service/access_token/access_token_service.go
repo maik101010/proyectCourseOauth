@@ -4,14 +4,14 @@ import (
 	"github.com/maik101010/proyectCourseOauth/src/domain/access_token"
 	"github.com/maik101010/proyectCourseOauth/src/repository/db"
 	"github.com/maik101010/proyectCourseOauth/src/repository/rest"
-	"github.com/maik101010/proyectCourseOauth/src/util/errors"
+	"github.com/maik101010/proyectCourseUtilsGoLibrary/rest_errors"
 	"strings"
 )
 
 type Service interface {
-	GetById(string) (*access_token.AccessToken, *errors.RestError)
-	Create(access_token.AccessTokenRequest) (*access_token.AccessToken, *errors.RestError)
-	UpdateExpirationTime(access_token.AccessToken) *errors.RestError
+	GetById(string) (*access_token.AccessToken, rest_errors.RestError)
+	Create(access_token.AccessTokenRequest) (*access_token.AccessToken, rest_errors.RestError)
+	UpdateExpirationTime(access_token.AccessToken) rest_errors.RestError
 }
 type service struct {
 	restUsersRepo rest.RestUsersRepository
@@ -23,10 +23,10 @@ func NewService(usersRepo rest.RestUsersRepository, repoDB db.DbRepository) Serv
 		dbRepo:        repoDB,
 	}
 }
-func (s *service)GetById(accessTokenId string) (*access_token.AccessToken, *errors.RestError){
+func (s *service)GetById(accessTokenId string) (*access_token.AccessToken, rest_errors.RestError){
 	accessTokenId = strings.TrimSpace(accessTokenId)
 	if len(accessTokenId)==0 {
-		return nil, errors.NewBadRequestError("invalid access token id")
+		return nil, rest_errors.NewBadRequestError("invalid access token id")
 	}
 	accessToken, err := s.dbRepo.GetById(accessTokenId)
 	if err!=nil {
@@ -34,7 +34,7 @@ func (s *service)GetById(accessTokenId string) (*access_token.AccessToken, *erro
 	}
 	return accessToken, nil
 }
-func (s *service) Create(atr access_token.AccessTokenRequest) (*access_token.AccessToken, *errors.RestError) {
+func (s *service) Create(atr access_token.AccessTokenRequest) (*access_token.AccessToken, rest_errors.RestError) {
 	if err := atr.Validate(); err!=nil{
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (s *service) Create(atr access_token.AccessTokenRequest) (*access_token.Acc
 	return &at, nil
 }
 
-func (s *service) UpdateExpirationTime(at access_token.AccessToken)  *errors.RestError {
+func (s *service) UpdateExpirationTime(at access_token.AccessToken)  rest_errors.RestError {
 	if err := at.Validate(); err != nil {
 		return err
 	}
